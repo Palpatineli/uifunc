@@ -1,5 +1,6 @@
 # provide decorators for functions that reads a folder/file name/list as the only argument
 import sys
+from functools import partial
 from typing import Callable, Any, Optional
 
 try:
@@ -17,7 +18,7 @@ class FolderSelector(object):
             folder = sys.argv[1]
         else:
             folder = folder_to_open()
-        return self.func(folder)
+        return partial(self.func, folder)
 
 
 class FoldersSelector(object):
@@ -30,7 +31,7 @@ class FoldersSelector(object):
             folders = sys.argv[1:]
         else:
             folders = folders_to_open()
-        return self.func(folders)
+        return partial(self.func, folders)
 
 
 class FilesSelector(object):
@@ -45,7 +46,7 @@ class FilesSelector(object):
             files = files_to_open(files)
         elif files is None:
             raise ValueError("supply a list of files or file filters in argument or command line arguments")
-        return func(files)
+        return partial(func, files)
 
 
 class FileSelector(object):
@@ -60,4 +61,4 @@ class FileSelector(object):
             file = file_to_open(file)
         elif file is None:
             raise ValueError("supply a list of files or file filters in argument or command line arguments")
-        return func(file)
+        return partial(func, file)
