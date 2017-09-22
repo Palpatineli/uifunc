@@ -14,9 +14,9 @@ def _choose_file(file_type: Union[TYPE, str, List[str]], func) -> Union[str, Lis
         default_ext, file_ext_list = FILE_TYPES[file_type]
         file_type_list = tuple((x[1:], '*' + x) for x in file_ext_list)
     elif isinstance(file_type, str):
-        default_ext, file_type_list = file_type, ((file_type[1:], '*' + file_type),)
+        default_ext, file_type_list = file_type, ((file_type, '*' + file_type),)
     elif isinstance(file_type, Iterable):
-        default_ext, file_type_list = next(iter(file_type))[1:], tuple((x[1:], '*' + x) for x in file_type)
+        default_ext, file_type_list = next(iter(file_type)), tuple((x, '*' + x) for x in file_type)
     else:
         raise ValueError('wrong file type :' + str(file_type))
     file_name = func(parent=root, defaultextension=default_ext, filetypes=file_type_list, initialdir=getcwd())

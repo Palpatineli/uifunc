@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='uifunc',
-    version='0.1.1',
+    version='0.1.2',
     packages=['uifunc'],
     url='https://github.com/Palpatineli/uifunc',
     download_url='https://github.com/Palpatineli/uifunc/archive/0.1.1.tar.gz',

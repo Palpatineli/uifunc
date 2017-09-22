@@ -1,64 +1,81 @@
 # provide decorators for functions that reads a folder/file name/list as the only argument
 import sys
-from functools import partial
-from typing import Callable, Any, Optional
+from typing import Callable, Optional, TypeVar
 
 try:
     from .wxopen import *
+    multi_folder = False
 except ImportError:
     from .tkopen import *
+    multi_folder = True
 
 
-class FolderSelector(object):
-    def __init__(self, func: Callable[[str], Any]):
+T = TypeVar('T')
+
+
+class FolderSelector(object):  # Folder(s)Selector doesn't take arguments, so the init argument is the callable
+    __func__ = folder_to_open
+
+    def __init__(self, func: Callable[[str], T]):
         self.func = func
 
-    def __call__(self)-> Callable[[], Any]:
-        if len(sys.argv) == 2:
-            folder = sys.argv[1]
-        else:
-            folder = folder_to_open()
-        return partial(self.func, folder)
+    def __call__(self)-> T:
+        folder = type(self).__func__() if len(sys.argv) == 1 else sys.argv[1]
+        return self.func(folder)
+
+
+class SaveFolderSelector(FolderSelector):
+    __func__ = folder_to_save
 
 
 class FoldersSelector(object):
-    def __init__(self, func: Callable[[List[str]], Any]):
-        print(type(func), func)
+    def __init__(self, func: Callable[[List[str]], T]):
         self.func = func
+        if not multi_folder:
+            raise ImportError("multi-folder selection require wxPython!")
 
-    def __call__(self) -> Callable[[], Any]:
-        if len(sys.argv) > 1:
-            folders = sys.argv[1:]
-        else:
-            folders = folders_to_open()
-        return partial(self.func, folders)
+    def __call__(self) -> T:
+        folders = folders_to_open() if len(sys.argv) == 1 else sys.argv[1:]
+        return self.func(folders)
 
 
 class FilesSelector(object):
-    def __init__(self, files: Optional[List[str]]=None):
-        self.files = files
+    __func__ = files_to_open
 
-    def __call__(self, func: Callable[[List[str]], Any]) -> Callable[[], Any]:
-        files = self.files
-        if len(sys.argv) > 1:
-            files = sys.argv[1:]
-        elif files and files[0].startswith('.'):
-            files = files_to_open(files)
-        elif files is None:
-            raise ValueError("supply a list of files or file filters in argument or command line arguments")
-        return partial(func, files)
+    def __init__(self, filters: Optional[List[str]]=None):
+        self.filters = filters
+
+    def __call__(self, func: Callable[[List[str]], T]) -> Callable[[], T]:
+        def temp():
+            filters = self.filters
+            if len(sys.argv) > 1:
+                filters = sys.argv[1:]
+            elif filters and filters[0].startswith('.'):
+                filters = type(self).__func__(filters)
+            elif filters is None:
+                raise ValueError("supply a list of files or file filters in argument or command line arguments")
+            return func(filters)
+        return temp
 
 
 class FileSelector(object):
-    def __init__(self, file: Optional[List[str]]=None):
-        self.file = file
+    __func__  = file_to_open
 
-    def __call__(self, func: Callable[[str], Any]) -> Callable[[], Any]:
-        file = self.file
-        if len(sys.argv) == 2:
-            file = sys.argv[1]
-        elif file and file[0].startswith('.'):
-            file = file_to_open(file)
-        elif file is None:
-            raise ValueError("supply a list of files or file filters in argument or command line arguments")
-        return partial(func, file)
+    def __init__(self, filters: Optional[List[str]]=None):
+        self.filters = filters
+
+    def __call__(self, func: Callable[[str], T]) -> Callable[[], T]:
+        def temp():
+            filters = self.filters
+            if len(sys.argv) == 2:
+                filters = sys.argv[1]
+            elif filters and filters[0].startswith('.'):
+                filters = type(self).__func__(filters)
+            elif filters is None:
+                raise ValueError("supply a list of files or file filters in argument or command line arguments")
+            return func(filters)
+        return temp
+
+
+class SaveSelector(FilesSelector):
+    __func__ = file_to_save
