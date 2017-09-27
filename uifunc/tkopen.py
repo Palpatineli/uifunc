@@ -5,15 +5,13 @@ from os import path, getcwd
 from tkinter import Tk
 from typing import Union, List, Iterable
 
-from .common_file_types import TYPE, FILE_TYPES
+
+Filter = Union[str, List[str]]
 
 
-def _choose_file(file_type: Union[TYPE, str, List[str]], func) -> Union[str, List[str]]:
+def _choose_file(file_type: Filter, func) -> Union[str, List[str]]:
     root = Tk()
-    if isinstance(file_type, TYPE):
-        default_ext, file_ext_list = FILE_TYPES[file_type]
-        file_type_list = tuple((x[1:], '*' + x) for x in file_ext_list)
-    elif isinstance(file_type, str):
+    if isinstance(file_type, str):
         default_ext, file_type_list = file_type, ((file_type, '*' + file_type),)
     elif isinstance(file_type, Iterable):
         default_ext, file_type_list = next(iter(file_type)), tuple((x, '*' + x) for x in file_type)
@@ -24,19 +22,19 @@ def _choose_file(file_type: Union[TYPE, str, List[str]], func) -> Union[str, Lis
     return file_name
 
 
-def file_to_open(file_type: Union[TYPE, str]) -> str:
+def file_to_open(file_type: Filter) -> str:
     return _choose_file(file_type, tkfd.askopenfilename)
 
 
-def files_to_open(file_type: Union[TYPE, str]) -> List[str]:
+def files_to_open(file_type: Filter) -> List[str]:
     return _choose_file(file_type, tkfd.askopenfilenames)
 
 
-def file_to_save(file_type: Union[TYPE, str]) -> str:
+def file_to_save(file_type: Filter) -> str:
     return _choose_file(file_type, tkfd.asksaveasfilename)
 
 
-def folder_to_open(default_dir: str = getcwd()) -> str:
+def folder_to_open(default_dir: str=getcwd()) -> str:
     root = Tk()
     folder = tkfd.askdirectory(parent=root, initialdir=default_dir)
     root.destroy()

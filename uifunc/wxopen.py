@@ -14,6 +14,7 @@ except ImportError:
 
 # noinspection PyArgumentList
 DialogStyle = Enum('DialogStyle', 'open save multiple')
+Filter = Union[str, List[str]]
 
 _file_dialog_style = {DialogStyle.open: wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
                       DialogStyle.save: wx.FD_SAVE,
@@ -33,8 +34,8 @@ def _select_item(dialog, style: DialogStyle) -> Union[str, List[str]]:
     return chosen_path
 
 
-def file_to_open(ext: Union[str, List[str]] = "", default_dir: str = getcwd(),
-                 style: DialogStyle = DialogStyle.open) -> Union[str, List[str]]:
+def file_to_open(ext: Filter="", default_dir: str=getcwd(),
+                 style: DialogStyle=DialogStyle.open) -> Union[str, List[str]]:
     if isinstance(ext, str):
         wildcard = "{0}|*{1}".format(ext[1:], ext)  # no space between pipe and wildcard
     elif isinstance(ext, list) or isinstance(ext, tuple):  # Default (*) | * would not give anything
@@ -47,11 +48,11 @@ def file_to_open(ext: Union[str, List[str]] = "", default_dir: str = getcwd(),
     return _select_item(open_file_dialog, style)
 
 
-def files_to_open(ext: Union[str, List[str]] = "", default_dir: str = getcwd()) -> List[str]:
+def files_to_open(ext: Filter="", default_dir: str=getcwd()) -> List[str]:
     return file_to_open(ext, default_dir, DialogStyle.multiple)
 
 
-def file_to_save(ext: Union[str, List[str]] = "", default_dir: str = getcwd()) -> str:
+def file_to_save(ext: Filter="", default_dir: str=getcwd()) -> str:
     return file_to_open(ext, default_dir, DialogStyle.save)
 
 
@@ -64,7 +65,7 @@ def _folder_dialog_filter(folder: str) -> str:
     return expanduser('~' + folder[14:]) if folder.startswith('Home directory') else folder
 
 
-def folder_to_open(default_dir: str = getcwd(), style: DialogStyle = DialogStyle.open) -> Union[str, Iterable[str]]:
+def folder_to_open(default_dir: str=getcwd(), style: DialogStyle=DialogStyle.open) -> Union[str, Iterable[str]]:
     _ = wx.App()
     open_folder_dialog = wx.lib.agw.multidirdialog.MultiDirDialog(
         None, "Select Folder", defaultPath=default_dir, agwStyle=_folder_dialog_style[style])
@@ -75,9 +76,9 @@ def folder_to_open(default_dir: str = getcwd(), style: DialogStyle = DialogStyle
         return (_folder_dialog_filter(x) for x in selection)
 
 
-def folders_to_open(default_dir: str = getcwd()) -> Iterable[str]:
+def folders_to_open(default_dir: str=getcwd()) -> Iterable[str]:
     return folder_to_open(default_dir, style=DialogStyle.multiple)
 
 
-def folder_to_save(default_dir: str = getcwd()) -> str:
+def folder_to_save(default_dir: str=getcwd()) -> str:
     return folder_to_open(default_dir, style=DialogStyle.save)
