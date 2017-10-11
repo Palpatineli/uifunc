@@ -37,8 +37,10 @@ def save_selector(file_path: str) -> str:
 def test_folder():
     folder_selector()
 
+
 def test_folders():
     folders_selector()
+
 
 def test_save_folders():
     save_folder_selector()
@@ -47,8 +49,10 @@ def test_save_folders():
 def test_file():
     file_selector()
 
+
 def test_files():
     files_selector()
+
 
 def test_save():
     save_selector()

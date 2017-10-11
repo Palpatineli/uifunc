@@ -1,5 +1,5 @@
 from functools import partial
-from os import getcwd
+from os import getcwd, path
 from typing import Union, List, Iterable, Callable
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QTimer
@@ -105,4 +105,10 @@ def folders_to_open(default_dir: str=getcwd()) -> Iterable[str]:
     # noinspection PyTypeChecker,PyCallByClass
     QTimer.singleShot(0, window.show_ui)
     app.exec_()
-    return window.file_names
+    file_names = window.file_names
+    # if the first item is a parent folder
+    if len(file_names) > 1:
+        parent = path.commonpath([path.abspath(file_names[0]), path.abspath(file_names[1])])
+        if parent == path.commonpath([path.abspath(file_names[0])]):
+            return file_names[1:]
+    return file_names
