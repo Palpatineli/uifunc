@@ -3,6 +3,8 @@
 import sys
 from typing import Optional, TypeVar, Union, List, Callable
 
+__all__ = ["FolderSelector", "SaveFolderSelector", "FoldersSelector", "FilesSelector", "FileSelector", "SaveSelector"]
+
 try:
     from .qtopen import *
     multi_folder = True
@@ -22,7 +24,7 @@ def filter_args(argv) -> Union[str, List[str]]:
     if len(argv) == 1:
         return list()
     flag = None
-    flags = list()  # flags
+    flags: List[str] = list()  # flags
     args = list()  # locational args
     for arg in argv[1:]:
         if flag is not None:
@@ -119,5 +121,5 @@ class FileSelector(object):
         return temp
 
 
-class SaveSelector(FilesSelector):
+class SaveSelector(FileSelector):
     __func__ = file_to_save

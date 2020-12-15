@@ -1,5 +1,6 @@
 dist
-noformat
-
+build
+__pycache__
 *.egg-info
-
+*.pyc
+*.so

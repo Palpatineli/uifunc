@@ -13,7 +13,7 @@ except Exception as error:
 
 setup(
     name='uifunc',
-    version='0.1.5',
+    version='0.1.6',
     packages=['uifunc'],
     url='https://github.com/Palpatineli/uifunc',
     download_url='https://github.com/Palpatineli/uifunc/archive/0.1.5.tar.gz',
